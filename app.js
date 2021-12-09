@@ -1,44 +1,33 @@
 const express = require('express');
-const mysql = require('mysql');
-const expressValidator = require('express-validator');
-//const myConnection=require('express-myconnection');
+const morgan = require('morgan');
+const helmet = require('helmet');
 const bodyParser = require('body-parser');
-const cookieParser=require('cookie-parser');
-const session= require('express-session');
-const flash = require('express-flash');
-//const config=require('./config');
+const rateLimit = require('express-rate-limit');
 const app = express();
-const routes = require('./routes/routes');
-const path = require('path');
-const methodOverride = require('method-override');
-const moment= require('moment');
-app.locals.moment=moment;
-app.locals.shortDateFormat="MM/DD/YYYY";
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
-app.use(express.static(__dirname + '/public'));
-//app.use(myConnection(mysql,config.database,'pool'));
+const globalErrorHandler = require('./controllers/errorController');
+const userRouter = require('./routes/userRoutes');
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(expressValidator());
-app.use(cookieParser('keyboard cat'));
-app.use(session({ 
-    secret: 'keyboard cat',
-    resave: false,
-    saveUninitialized: true,
-    cookie: { maxAge: 60000 }
-}));
-app.use(methodOverride(function (req, res) {
-    if (req.body && typeof req.body === 'object' && '_method' in req.body) {
-      // look in urlencoded POST bodies and delete it
-      var method = req.body._method
-      delete req.body._method
-      return method
-    }
-  }))
-app.use(flash());
-app.use(bodyParser.json());
-app.use('/', routes);
-app.listen(3000, function () {
-    console.log("App started at port 3000!!");
+
+app.use(helmet());
+if (process.env.NODE_ENV === 'development') {
+    app.use(morgan('dev'));
+}
+
+// Api rate limiting
+const limiter = rateLimit({
+  max: 100,
+  windowMS: 60 * 60 * 1000,
+  message: 'Too many request from this ip, Please try again in an hour'
 });
+
+app.use('/api/v1/users', limiter);
+
+// Routes
+app.use('/api/v1/users', userRouter);
+
+// Error Handling middleware
+app.use(globalErrorHandler);
+
+module.exports = app
