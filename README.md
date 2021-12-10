@@ -1,5 +1,5 @@
 # Node-Sequelize
-Basic **ATS Backend Using NodeJS and Sql** 
+Basic **API development Using NodeJS and Sql** 
 
 ## Topics
 1. [Introduction](#introduction)
