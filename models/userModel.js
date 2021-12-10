@@ -51,11 +51,12 @@ const userSchema = sequelize.define('User', {
         }
     }
 }, {
-    tableName: 'users'
+    tableName: 'users',
 });
 
 userSchema.beforeCreate(async (user, options) => {
     user.password = await bcrypt.hash(user.password, 12);
 });
+
 
 module.exports = userSchema;

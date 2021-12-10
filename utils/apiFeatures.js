@@ -28,7 +28,7 @@ class APIFeatures {
             }, [])
             this.features.sortBy = sortBy;
         } else {
-            this.features.sortBy = ['id', 'DESC'];
+            this.features.sortBy = [['id', 'DESC']];
         }
 
         return this;

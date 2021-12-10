@@ -2,10 +2,9 @@ const AppError = require('./../utils/appError');
 const APIFeatures = require('./../utils/apiFeatures');
 const catchAsync = require('./../utils/catchAsync');
 
-exports.getAll = Model => catchAsync(async(req, res, next) => {
+exports.getAll = (Model, attributes) => catchAsync(async(req, res, next) => {
 
     const {features} = new APIFeatures(req.query).filter().limitFields().sort().paginate();
-    console.log(features);
     const doc = await Model.findAll({
         attributes: features.fields,
         order: features.sortBy,
